@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://todo-sdd.local/contracts/persistencia.schema.json",
+  "title": "Sobre de persistencia de tareas",
+  "description": "Forma del valor JSON guardado en localStorage bajo la clave todo-sdd:tareas:v1. La validación de fechas reales (por ejemplo, rechazar 2026-02-30) se realiza en el dominio, además de este esquema.",
+  "type": "object",
+  "required": ["version", "tareas"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 1,
+      "description": "Versión del formato de almacenamiento."
+    },
+    "tareas": {
+      "type": "array",
+      "description": "Lista completa de tareas guardadas.",
+      "items": {
+        "$ref": "#/$defs/tarea"
+      }
+    }
+  },
+  "$defs": {
+    "tarea": {
+      "type": "object",
+      "required": [
+        "id",
+        "titulo",
+        "descripcion",
+        "fechaLimite",
+        "prioridad",
+        "completada",
+        "creadaEn"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Identificador único generado con crypto.randomUUID()."
+        },
+        "titulo": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Título sin espacios en los extremos; nunca vacío."
+        },
+        "descripcion": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Descripción opcional; cadena vacía si no se indicó."
+        },
+        "fechaLimite": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Día del calendario sin hora, o null si no tiene fecha."
+        },
+        "prioridad": {
+          "type": "string",
+          "enum": ["alta", "media", "baja"]
+        },
+        "completada": {
+          "type": "boolean",
+          "description": "false = pendiente; true = completada."
+        },
+        "creadaEn": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Momento de creación en ISO 8601; se usa para desempatar el orden."
+        }
+      }
+    }
+  }
+}
